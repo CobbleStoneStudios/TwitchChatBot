@@ -19,6 +19,7 @@ object TestBot {
         builder.addEventListener(new TwitchEventListener)
 
         bot = builder.build()
+        bot.login()
     }
 
 }

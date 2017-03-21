@@ -2,6 +2,7 @@ package com.css.cobble.twitchChatBot
 
 import java.util
 
+import com.css.cobble.twitchChatBot.api.events.OnReadyEvent
 import com.css.cobble.twitchChatBot.api.{ITwitchChatClient, ITwitchChatEventListener}
 import io.netty.bootstrap.Bootstrap
 import io.netty.buffer.Unpooled
@@ -15,12 +16,17 @@ import io.netty.util.concurrent.{Future, GenericFutureListener}
 
 class TwitchChatClient(host: String, port: Int = 6667, username: String, oAuth: String, tagsCap: Boolean = true, membershipCap: Boolean = true, commandsCap: Boolean = true, eventListeners: Array[ITwitchChatEventListener]) extends ITwitchChatClient {
 
+    val bootstrap: Bootstrap = new Bootstrap()
+
     val workerGroup: EventLoopGroup = new NioEventLoopGroup()
 
     var channel: Channel = _
 
+    var isConnected: Boolean = false
+
+    var isLoggedIn: Boolean = false
+
     try {
-        val bootstrap: Bootstrap = new Bootstrap()
         bootstrap.group(workerGroup)
         bootstrap.channel(classOf[NioSocketChannel])
         bootstrap.option[java.lang.Boolean](ChannelOption.SO_KEEPALIVE, true)
@@ -37,14 +43,18 @@ class TwitchChatClient(host: String, port: Int = 6667, username: String, oAuth: 
                 })
             }
         })
+    } catch {
+        case e: Exception =>
+            shutdown()
+            throw e
+    }
+
+    def connect(): Unit = {
         val channelFuture: ChannelFuture = bootstrap.connect(host, port).sync()
 
-        println("Connected")
+        this.isConnected = true
 
         channel = channelFuture.channel()
-
-        channel.writeAndFlush(s"PASS $oAuth")
-        channel.writeAndFlush(s"NICK $username")
 
         if (tagsCap)
             channel.writeAndFlush("CAP REQ :twitch.tv/tags")
@@ -59,14 +69,25 @@ class TwitchChatClient(host: String, port: Int = 6667, username: String, oAuth: 
                     shutdown()
             }
         })
+    }
 
-    } catch {
-        case e: Exception =>
-            shutdown()
-            throw e
+    def login(): Unit = {
+        if(!this.isConnected)
+            connect()
+
+        channel.writeAndFlush(s"PASS $oAuth")
+        channel.writeAndFlush(s"NICK $username")
+
+        this.isLoggedIn = true
+
+        val readyEvent = new OnReadyEvent(this)
+
+        eventListeners.foreach(_.onReady(readyEvent))
     }
 
     def shutdown(): Unit = {
+        this.isConnected = false
+        this.isLoggedIn = false
         workerGroup.shutdownGracefully()
     }
 

@@ -60,10 +60,5 @@ class TwitchChatClientBuilder {
 
     def getEventListeners: Array[ITwitchChatEventListener] = this.eventListeners.toArray
 
-    def build(): TwitchChatClient = {
-        val eventListenersArr: Array[ITwitchChatEventListener] = this.eventListeners.toArray
-        val c = new TwitchChatClient(host, port, username, oAuth, tagsCap, membershipCap, commandsCap, eventListenersArr)
-        eventListenersArr.foreach(_.onReady(new OnReadyEvent(c)))
-        c
-    }
+    def build(): TwitchChatClient = new TwitchChatClient(host, port, username, oAuth, tagsCap, membershipCap, commandsCap, this.eventListeners.toArray)
 }
