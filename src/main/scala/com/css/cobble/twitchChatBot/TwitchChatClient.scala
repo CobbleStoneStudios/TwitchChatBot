@@ -26,11 +26,11 @@ class TwitchChatClient(host: String, port: Int = 6667, username: String, oAuth: 
         bootstrap.option[java.lang.Boolean](ChannelOption.SO_KEEPALIVE, true)
         bootstrap.handler(new ChannelInitializer[SocketChannel]() {
             override def initChannel(channel: SocketChannel): Unit = {
-                channel.pipeline().addLast("line splitter", new DelimiterBasedFrameDecoder(4096, Unpooled.wrappedBuffer(Array[Byte]('\r', '\n'))))
-                channel.pipeline().addLast("string decoder", new StringDecoder())
-                channel.pipeline().addLast("handler", new TwitchChatChannelHandler())
-                channel.pipeline().addLast("string encoder", new StringEncoder())
-                channel.pipeline().addLast("add line breaks", new MessageToMessageEncoder[String]() {
+                channel.pipeline().addLast("[INPUT] line splitter", new DelimiterBasedFrameDecoder(4096, Unpooled.wrappedBuffer(Array[Byte]('\r', '\n'))))
+                channel.pipeline().addLast("[INPUT] string decoder", new StringDecoder())
+                channel.pipeline().addLast("[INPUT] handler", new TwitchChatChannelHandler())
+                channel.pipeline().addLast("[OUTPUT] string encoder", new StringEncoder())
+                channel.pipeline().addLast("[OUTPUT] add line breaks", new MessageToMessageEncoder[String]() {
                     override def encode(ctx: ChannelHandlerContext, msg: String, out: util.List[AnyRef]): Unit = {
                         out.add(msg + "\r\n")
                     }
