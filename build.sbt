@@ -23,7 +23,7 @@ crossPaths := false
 
 target in Compile in doc := baseDirectory.value / "docs"
 
-apiURL := Some(url("https://cobbleopolis.github.io/TwitchChatBot/"))
+apiURL := Some(url("https://cobblestonestudios.github.io/TwitchChatBot/"))
 
 autoAPIMappings := true
 
