@@ -44,6 +44,8 @@ testOptions in Test ++= Seq(
     Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/test-reports")
 )
 
+javaOptions in Test += "-Dconfig.file=conf/application.test.conf"
+
 lazy val `twitchchatbot` = project in file(".")
 
 lazy val `example` = (project in file("example")).settings(

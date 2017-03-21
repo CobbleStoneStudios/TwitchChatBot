@@ -1,0 +1,15 @@
+language: scala
+scala:
+- 2.11.7
+sbt_args: 
+before_install:
+- openssl aes-256-cbc -K $encrypted_c68c71f00fb3_key -iv $encrypted_c68c71f00fb3_iv
+  -in application.test.conf.enc -out application.test.conf -d
+cache:
+  directories:
+  - "$HOME/.ivy2/cache"
+  - "$HOME/.sbt/boot/"
+notifications:
+  email:
+    on_success: change
+    on_failure: always
