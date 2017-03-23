@@ -7,9 +7,14 @@ before_install:
   -in application.test.conf.enc -out application.test.conf -d
 cache:
   directories:
-  - "$HOME/.ivy2/cache"
-  - "$HOME/.sbt/boot/"
+    - "$HOME/.ivy2/cache"
+    - "$HOME/.sbt/boot/"
 notifications:
   email:
     on_success: change
+    on_failure: always
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/2263bea321f7a3794123
+    on_success: always
     on_failure: always
