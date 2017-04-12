@@ -22,9 +22,7 @@ lazy val `example` = (project in file("example")).settings(
         "ch.qos.logback" % "logback-classic" % logbackVersion,
         "com.typesafe" % "config" % "1.3.1"
     ),
-    crossPaths := false,
-    javaOptions in run += "-Dconfig.file=conf/application.test.conf",
-    fork in run := true
+    crossPaths := false
 ).dependsOn(`twitchchatbot`)
 
 libraryDependencies ++= Seq(
