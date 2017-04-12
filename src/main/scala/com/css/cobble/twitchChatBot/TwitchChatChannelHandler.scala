@@ -9,7 +9,7 @@ class TwitchChatChannelHandler extends ChannelInboundHandlerAdapter {
         val msgStr: String = msg.asInstanceOf[String]
         if(msgStr.contains(MessageRef.PING_MSG))
             ctx.channel().writeAndFlush(MessageRef.PONG_MSG)
-        println(s"Message: $msg")
+        logger.debug(s">: $msg")
     }
 
     override def exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable): Unit = {
