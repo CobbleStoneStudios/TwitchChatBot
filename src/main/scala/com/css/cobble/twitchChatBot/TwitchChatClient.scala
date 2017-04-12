@@ -34,7 +34,9 @@ class TwitchChatClient(host: String, port: Int = 6667, username: String, oAuth: 
             override def initChannel(channel: SocketChannel): Unit = {
                 channel.pipeline().addLast("[INPUT] line splitter", new DelimiterBasedFrameDecoder(4096, Unpooled.wrappedBuffer(Array[Byte]('\r', '\n'))))
                 channel.pipeline().addLast("[INPUT] string decoder", new StringDecoder())
+                channel.pipeline().addLast("[INPUT] logging handler", new TwitchChatLoggingHandler.Inbound())
                 channel.pipeline().addLast("[INPUT] handler", new TwitchChatChannelHandler())
+                channel.pipeline().addLast("[OUTPUT] logging handler", new TwitchChatLoggingHandler.Outbound())
                 channel.pipeline().addLast("[OUTPUT] string encoder", new StringEncoder())
                 channel.pipeline().addLast("[OUTPUT] add line breaks", new MessageToMessageEncoder[String]() {
                     override def encode(ctx: ChannelHandlerContext, msg: String, out: util.List[AnyRef]): Unit = {
