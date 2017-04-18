@@ -1,6 +1,6 @@
 package com.css.cobble.twitchChatBot.ref
 
-object MessageRef {
+object TwitchMessageRef {
 
     final val TWITCH_URL: String = "tmi.twitch.tv"
 

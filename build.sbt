@@ -27,7 +27,7 @@ lazy val `example` = (project in file("example")).settings(
 
 libraryDependencies ++= Seq(
     "io.netty" % "netty-all" % "4.1.9.Final",
-    "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.1" % "test->*" excludeAll ExclusionRule(organization="org.junit", name="junit"),
     "org.pegdown" % "pegdown" % "1.4.2",
     "org.slf4j" % "slf4j-api" % "1.7.25"
 )
@@ -58,10 +58,7 @@ publishTo := {
 
 publishArtifact in Test := false
 
-testOptions in Test ++= Seq(
-    Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/test-reports"),
-    Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/test-reports")
-)
+testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/test-reports")
 
 pomIncludeRepository := { _ => false }
 
