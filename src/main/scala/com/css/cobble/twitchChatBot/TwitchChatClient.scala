@@ -2,8 +2,11 @@ package com.css.cobble.twitchChatBot
 
 import java.util
 
+import com.css.cobble
+import com.css.cobble.twitchChatBot
 import com.css.cobble.twitchChatBot.api.events.OnReadyEvent
 import com.css.cobble.twitchChatBot.api.{ITwitchChatClient, ITwitchChatEventListener}
+import com.css.cobble.twitchChatBot.TwitchChatLoggingHandler._
 import io.netty.bootstrap.Bootstrap
 import io.netty.buffer.Unpooled
 import io.netty.channel._
@@ -12,9 +15,13 @@ import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioSocketChannel
 import io.netty.handler.codec.{DelimiterBasedFrameDecoder, MessageToMessageEncoder}
 import io.netty.handler.codec.string.{StringDecoder, StringEncoder}
+import io.netty.handler.logging.LoggingHandler
 import io.netty.util.concurrent.{Future, GenericFutureListener}
+import io.netty.util.internal.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 class TwitchChatClient(host: String, port: Int = 6667, username: String, oAuth: String, tagsCap: Boolean = true, membershipCap: Boolean = true, commandsCap: Boolean = true, eventListeners: Array[ITwitchChatEventListener]) extends ITwitchChatClient {
+
+    InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE)
 
     val bootstrap: Bootstrap = new Bootstrap()
 
@@ -34,15 +41,15 @@ class TwitchChatClient(host: String, port: Int = 6667, username: String, oAuth: 
             override def initChannel(channel: SocketChannel): Unit = {
                 channel.pipeline().addLast("[INPUT] line splitter", new DelimiterBasedFrameDecoder(4096, Unpooled.wrappedBuffer(Array[Byte]('\r', '\n'))))
                 channel.pipeline().addLast("[INPUT] string decoder", new StringDecoder())
-                channel.pipeline().addLast("[INPUT] logging handler", new TwitchChatLoggingHandler.Inbound())
+                channel.pipeline().addLast("[INPUT] logging", new twitchChatBot.TwitchChatLoggingHandler.Inbound())
                 channel.pipeline().addLast("[INPUT] handler", new TwitchChatChannelHandler())
-                channel.pipeline().addLast("[OUTPUT] logging handler", new TwitchChatLoggingHandler.Outbound())
                 channel.pipeline().addLast("[OUTPUT] string encoder", new StringEncoder())
                 channel.pipeline().addLast("[OUTPUT] add line breaks", new MessageToMessageEncoder[String]() {
                     override def encode(ctx: ChannelHandlerContext, msg: String, out: util.List[AnyRef]): Unit = {
                         out.add(msg + "\r\n")
                     }
                 })
+                channel.pipeline().addLast("[OUTPUT] logging", new twitchChatBot.TwitchChatLoggingHandler.Outbound())
             }
         })
     } catch {
