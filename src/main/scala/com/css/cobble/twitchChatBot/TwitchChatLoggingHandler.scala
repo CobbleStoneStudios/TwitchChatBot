@@ -22,7 +22,10 @@ object TwitchChatLoggingHandler {
 
     class Outbound extends ChannelOutboundHandlerAdapter {
         override def write(ctx: ChannelHandlerContext, msg: scala.Any, promise: ChannelPromise): Unit = {
-            botLogger.debug(s"$outputPrefix $msg")
+            msg match {
+                case s: String if s.startsWith("PASS") => botLogger.debug(s"$outputPrefix ${msg.asInstanceOf[String].replaceAll("oauth:.*", "<oauth_token>")}")
+                case _ => botLogger.debug(s"$outputPrefix $msg")
+            }
             super.write(ctx, msg, promise)
         }
 
